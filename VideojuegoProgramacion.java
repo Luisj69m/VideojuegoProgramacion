@@ -15,6 +15,22 @@ public class VideojuegoProgramacion {
                 } else {
                     System.out.println("No se pudo crear el fichero de configuración.");
                 }
+            for (String dir : directorios) {
+                    File directory = new File(dir);
+                    if (!directory.exists()) {
+                        if (directory.mkdir()) {
+                            System.out.println("Directorio creado: " + dir);
+                        } else {
+                            System.out.println("No se pudo crear el directorio: " + dir);
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                System.out.println("Error al crear el fichero de configuración: " + e.getMessage());
+            }
+        } else {
+            System.out.println("El fichero de configuración ya existe. No se realizan cambios.");
+        }
 
     }
 }
