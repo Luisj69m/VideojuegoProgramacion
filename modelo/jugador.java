@@ -35,6 +35,7 @@ public class Jugador {
         }
     }
 
+
     public String getNombre() { return nombre; }
     public int getPuntuacion() { return puntuacion; }
 }
