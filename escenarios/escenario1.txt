@@ -1,8 +1,6 @@
-10x7
-XXXXXXXXXX
-XI.......X
-X.XXXXXX.X
-X.X....X.X
-X.XXXX.X.X
-X......XFX
-XXXXXXXXXX
+5x5
+XXXXX
+XI..X
+X.X.X
+X.X.X
+X..FX

@@ -1,0 +1,11 @@
+10x10
+XXXXXXXXXX
+XI......XX
+X.XX.XX..X
+X....X..XX
+X.XXXX.X.X
+X.......FX
+X.X....X.X
+X...XX...X
+X.X....X.X
+XXXXXXXXXX
