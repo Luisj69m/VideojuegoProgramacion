@@ -1,44 +1,96 @@
 package modelo;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.FileReader;
-import java.io.BufferedWriter;
-import java.io.BufferedReader;
+import java.io.FileOutputStream;
+import java.io.FileInputStream;
+import java.io.ObjectOutputStream;
+import java.io.ObjectInputStream;
 import java.io.IOException;
+import java.io.Serializable;
 
-public class Jugador {
+/**
+ * Clase que representa un jugador con nombre y email.
+ * Permite guardar y cargar los datos del jugador en un archivo binario.
+ * @Autor:Luis Marcano
+ * @Autor:Daniel Moñino
+ * @Autor:Ivan Rubio
+ */
+public class Jugador implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private String nombre;
-    private int puntuacion;
+    private String email;
 
-    public Jugador(String nombre) {
+    /**
+     * Constructor que crea un nuevo objeto Jugador con el nombre y el email especificados.
+     *
+     * @param nombre El nombre del jugador.
+     * @param email El email del jugador.
+     */
+    public Jugador(String nombre, String email) {
         this.nombre = nombre;
-        this.puntuacion = 0; // Por defecto en 0
-        cargar();
+        this.email = email;
     }
 
+    /**
+     * Obtiene el nombre del jugador.
+     *
+     * @return El nombre del jugador.
+     */
+    public String getNombre() {
+        return nombre;
+    }
+
+    /**
+     * Obtiene el email del jugador.
+     *
+     * @return El email del jugador.
+     */
+    public String getEmail() {
+        return email;
+    }
+
+    /**
+     * Guarda el jugador en un archivo binario dentro del directorio "jugadores".
+     * Si el directorio no existe, se crea.
+     * El archivo se guarda con el nombre del jugador como nombre del archivo y extensión ".dat".
+     */
     public void guardar() {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter("jugadores/jugador.dat"))) {
-            bw.write(nombre + "," + puntuacion);
+        // Crear el directorio "jugadores" si no existe
+        File directorio = new File("jugadores");
+        if (!directorio.exists()) {
+            directorio.mkdir();
+        }
+
+        // Guardar el objeto Jugador en un archivo binario
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("jugadores/" + nombre + ".dat"))) {
+            oos.writeObject(this);
+            System.out.println("Jugador guardado correctamente.");
         } catch (IOException e) {
-            System.out.println("Error al guardar jugador: " + e.getMessage());
+            System.out.println("Error al guardar el jugador: " + e.getMessage());
         }
     }
 
-    private void cargar() {
-        try (BufferedReader br = new BufferedReader(new FileReader("jugadores/jugador.dat"))) {
-            String[] datos = br.readLine().split(",");
-            this.nombre = datos[0];
-            this.puntuacion = Integer.parseInt(datos[1]);
-        } catch (IOException e) {
-            System.out.println("No se encontró archivo de jugador, iniciando nuevo.");
+    /**
+     * Carga un jugador desde un archivo binario.
+     * Busca el archivo con el nombre del jugador y lo carga.
+     *
+     * @param nombre El nombre del jugador a cargar.
+     * @return El objeto Jugador cargado, o null si no se encuentra o ocurre un error.
+     */
+    public static Jugador cargar(String nombre) {
+        // Buscar el archivo con el nombre del jugador
+        File archivo = new File("jugadores/" + nombre + ".dat");
+        if (!archivo.exists()) {
+            return null; // Si no existe, retornar null
         }
-    }
 
-    public String getNombre() { 
-        return nombre; 
-    }
-    public int getPuntuacion() { 
-        return puntuacion;
+        // Cargar el objeto Jugador desde el archivo
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(archivo))) {
+            return (Jugador) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("Error al cargar el jugador: " + e.getMessage());
+            return null; // Si ocurre un error, retornar null
+        }
     }
 }
