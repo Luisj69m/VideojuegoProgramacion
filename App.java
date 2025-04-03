@@ -1,5 +1,5 @@
-package controlador;
 
+import controlador.Controlador;
 import modelo.Configuracion;
 import modelo.Jugador;
 
