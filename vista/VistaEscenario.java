@@ -46,3 +46,4 @@ public class VistaEscenario {
         System.out.println("Laberinto (" + escenario.getAncho() + "x" + escenario.getAlto() + "):");
         escenario.mostrarEscenario();
     }
+}
