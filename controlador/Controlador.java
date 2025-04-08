@@ -2,62 +2,135 @@ package controlador;
 
 import modelo.Escenario;
 import modelo.Jugador;
-import vista.VistaEscenario;
 
-/**
- * Controlador que gestiona la interacción entre el modelo (Escenario, Jugador) y la vista (VistaEscenario).
- * Se encarga de mostrar el escenario y gestionar la carga o creación de jugadores.
- * 
- * @author Luis José Marcano
- * @author Dani Moñino
- * @author Ivan Rubio
- * Licencia: GPL V3.0
- */
-    public class Controlador {
+import java.io.*;
+import java.util.*;
+
+public class Controlador {
     private Escenario escenario;
-    private VistaEscenario vista;
+    private int jugadorX = 1;
+    private int jugadorY = 1;
+    private Jugador jugador;
 
-    /**
-     * Constructor del controlador. Carga un escenario desde la ruta especificada.
-     * 
-     * @param rutaEscenario Ruta del archivo que contiene la configuración del escenario.
-     */
     public Controlador(String rutaEscenario) {
         this.escenario = new Escenario(rutaEscenario);
-        this.vista = new VistaEscenario();
     }
 
-    /**
-     * Muestra el escenario en la vista.
-     */
-    public void mostrarEscenario() {
-        vista.mostrar(escenario);
-    }
+    public Jugador iniciarJugador() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Introduce tu nombre de jugador: ");
+        String nombre = scanner.nextLine().trim();
 
-    /**
-     * Método para gestionar la inicialización o carga del jugador.
-     * 
-     * - Pregunta al usuario su nombre de usuario.
-     * - Si existe un archivo con ese nombre, carga los datos del jugador.
-     * - Si no existe, solicita el email, crea un nuevo jugador y lo guarda.
-     * 
-     * @return Jugador cargado o creado.
-     */
-    public static Jugador iniciarJugador() {
-        // Pedir al usuario el nombre
-        String nombre = VistaEscenario.pedirEntrada("Introduce tu nombre de usuario: ");
-        Jugador jugador = Jugador.cargar(nombre);
-
-        if (jugador != null) {
-            VistaEscenario.mostrarMensaje("¡Bienvenido de nuevo, " + jugador.getNombre() + "!");
-            VistaEscenario.mostrarMensaje("Email registrado: " + jugador.getEmail());
-        } else {
-            // Si el jugador no existe, se le pide el correo y se guarda el jugador
-            String email = VistaEscenario.pedirEntrada("No se encontró el usuario. Introduce tu email: ");
-            jugador = new Jugador(nombre, email);
-            jugador.guardar();
-            VistaEscenario.mostrarMensaje("Nuevo usuario registrado con éxito.");
+        File archivo = new File("jugadores/" + nombre + ".dat");
+        if (archivo.exists()) {
+            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(archivo))) {
+                jugador = (Jugador) ois.readObject();
+                System.out.println("Bienvenido de nuevo, " + jugador.getNombre() + "!");
+            } catch (IOException | ClassNotFoundException e) {
+                System.out.println("Error al cargar el jugador. Se creará uno nuevo.");
+            }
         }
-    return jugador;
+
+        if (jugador == null) {
+            System.out.print("Introduce tu email: ");
+            String email = scanner.nextLine().trim();
+            jugador = new Jugador(nombre, email);
+
+            try {
+                new File("jugadores").mkdirs();
+                ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(archivo));
+                oos.writeObject(jugador);
+                oos.close();
+                System.out.println("Jugador guardado exitosamente.");
+            } catch (IOException e) {
+                System.out.println("No se pudo guardar el jugador.");
+            }
+        }
+
+        return jugador;
+    }
+
+    public void mostrarEscenario() {
+        for (String linea : escenario.getMapa()) {
+            System.out.println(linea);
+        }
+    }
+
+    public void iniciarJuegoInteractivo() {
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            limpiarPantalla();
+            mostrarEscenarioConJugador();
+
+            System.out.print("WASD> ");
+            String input = scanner.nextLine().trim().toUpperCase();
+            if (input.isEmpty()) continue;
+
+            char tecla = input.charAt(0);
+            int nuevaX = jugadorX;
+            int nuevaY = jugadorY;
+
+            switch (tecla) {
+                case 'W' -> nuevaY--;
+                case 'S' -> nuevaY++;
+                case 'A' -> nuevaX--;
+                case 'D' -> nuevaX++;
+                case 'Q' -> {
+                    System.out.println("Saliendo del juego...");
+                    return;
+                }
+                default -> {
+                    continue;
+                }
+            }
+
+            if (puedeMoverA(nuevaX, nuevaY)) {
+                jugadorX = nuevaX;
+                jugadorY = nuevaY;
+            } else {
+                // Mostrar mensaje "ouch!" sobre el jugador
+                escenario.getMapa().set(jugadorY - 1, insertarTexto(escenario.getMapa().get(jugadorY - 1), jugadorX, "ouch!"));
+            }
+        }
+    }
+
+    private void mostrarEscenarioConJugador() {
+        List<String> mapa = new ArrayList<>(escenario.getMapa());
+
+        for (int y = 0; y < mapa.size(); y++) {
+            String linea = mapa.get(y);
+            if (y == jugadorY) {
+                linea = insertarTexto(linea, jugadorX, "O");
+            }
+            System.out.println(linea);
+        }
+    }
+
+    private String insertarTexto(String linea, int x, String texto) {
+        StringBuilder sb = new StringBuilder(linea);
+        for (int i = 0; i < texto.length(); i++) {
+            int pos = x + i;
+            if (pos < sb.length()) {
+                sb.setCharAt(pos, texto.charAt(i));
+            }
+        }
+        return sb.toString();
+    }
+
+    private boolean puedeMoverA(int x, int y) {
+        List<String> mapa = escenario.getMapa();
+
+        if (y < 0 || y >= mapa.size()) return false;
+
+        String linea = mapa.get(y);
+        if (x < 0 || x >= linea.length()) return false;
+
+        return linea.charAt(x) != 'x';
+    }
+
+    private void limpiarPantalla() {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
     }
 }
