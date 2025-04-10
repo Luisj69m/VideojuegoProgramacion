@@ -69,6 +69,6 @@ public class GeneradorEscenario {
             System.err.println("Error al leer el archivo: " + e.getMessage());
         }
 
-        return mapa;
-    }
+        return mapa;
+    }
 }

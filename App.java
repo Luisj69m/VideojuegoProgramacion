@@ -14,5 +14,5 @@ public class App {
         controlador.mostrarEscenario();
 
         controlador.iniciarJuegoInteractivo();
-    }
+    }
 }
