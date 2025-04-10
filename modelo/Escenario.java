@@ -40,22 +40,35 @@ public class Escenario {
      * @param rutaArchivo Ruta del archivo del escenario.
      */
     private void cargarEscenario(String rutaArchivo) {
-        try (BufferedReader br = new BufferedReader(new FileReader(rutaArchivo))) {
-            // Leer la primera línea con las dimensiones del escenario
-            String dimensiones = br.readLine();
-            String[] partes = dimensiones.split("x");
-            this.ancho = Integer.parseInt(partes[0]);
-            this.alto = Integer.parseInt(partes[1]);
+    mapa.clear();
 
-            // Leer el mapa línea por línea
+    try (BufferedReader br = new BufferedReader(new FileReader(rutaArchivo))) {
+        String primeraLinea = br.readLine();
+
+        if (primeraLinea != null && primeraLinea.matches("\\d+x\\d+")) {
+            // Es formato comprimido → usar GeneradorEscenario
+            mapa = GeneradorEscenario.generarDesdeArchivo(rutaArchivo);
+        } else {
+            // Es formato tradicional (primera línea = dimensiones)
+            if (primeraLinea == null) {
+                throw new IOException("Archivo vacío");
+            }
+
+            // Leer dimensiones como antes
+            String[] dimensiones = primeraLinea.split("x");
+            this.ancho = Integer.parseInt(dimensiones[0]);
+            this.alto = Integer.parseInt(dimensiones[1]);
+
             String linea;
             while ((linea = br.readLine()) != null) {
                 mapa.add(linea);
             }
-        } catch (IOException e) {
-            System.out.println("Error al cargar el escenario: " + e.getMessage());
         }
+    } catch (IOException e) {
+        System.err.println("Error al leer el escenario: " + e.getMessage());
     }
+}
+
 
     /**
      * Muestra el escenario en la consola.

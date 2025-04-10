@@ -1,4 +1,3 @@
-
 import controlador.Controlador;
 import modelo.Configuracion;
 import modelo.Jugador;
@@ -14,5 +13,5 @@ public class App {
         controlador.mostrarEscenario();
 
         controlador.iniciarJuegoInteractivo();
-    }
+}
 }
