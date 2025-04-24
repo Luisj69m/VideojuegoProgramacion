@@ -69,8 +69,7 @@ public class Controlador {
         // Crear un GridPane para el escenario
         GridPane grid = escenario.generarEscenario();  // Genera el escenario con la lógica de dibujo
 
-        // Añadir el GridPane con el escenario al contenedor principal
-        // Suponiendo que tienes un contenedor (por ejemplo, un GridPane o StackPane) en tu archivo FXML
+        // Añadimos el GridPane con el escenario al contenedor principal
         Parent contenedorJuego = (Parent) root;
         
         // Aquí agregamos el escenario generado
