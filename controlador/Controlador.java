@@ -1,136 +1,122 @@
 package controlador;
 
-import modelo.Escenario;
-import modelo.Jugador;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.stage.Stage;
+import modelo.*;
+import vista.*;
+import javafx.scene.layout.GridPane;  // Necesario para usar GridPane
+import modelo.Escenario;  // Necesario para usar la clase Escenario
 
-import java.io.*;
-import java.util.*;
+
+
+
+import java.io.File;
+import java.util.List;
 
 public class Controlador {
-    private Escenario escenario;
-    private int jugadorX = 1;
-    private int jugadorY = 1;
+    private Stage ventana;
     private Jugador jugador;
 
-    public Controlador(String rutaEscenario) {
-        this.escenario = new Escenario(rutaEscenario);
+    public Controlador(Stage ventana) {
+        this.ventana = ventana;
     }
 
-    public Jugador iniciarJugador() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Introduce tu nombre de jugador: ");
-        String nombre = scanner.nextLine().trim();
+    public void mostrarSplash() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/vista/vista_splash.fxml"));
+            Parent root = loader.load();
 
-        File archivo = new File("jugadores/" + nombre + ".dat");
-        if (archivo.exists()) {
-            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(archivo))) {
-                jugador = (Jugador) ois.readObject();
-                System.out.println("Bienvenido de nuevo, " + jugador.getNombre() + "!");
-            } catch (IOException | ClassNotFoundException e) {
-                System.out.println("Error al cargar el jugador. Se creará uno nuevo.");
-            }
-        }
+            VistaSplash vistaSplash = loader.getController();
+            Scene escena = new Scene(root, 600, 400);
+            ventana.setScene(escena);
+            ventana.setTitle("Pantalla Splash");
+            ventana.show();
 
-        if (jugador == null) {
-            System.out.print("Introduce tu email: ");
-            String email = scanner.nextLine().trim();
-            jugador = new Jugador(nombre, email);
-
-            try {
-                new File("jugadores").mkdirs();
-                ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(archivo));
-                oos.writeObject(jugador);
-                oos.close();
-                System.out.println("Jugador guardado exitosamente.");
-            } catch (IOException e) {
-                System.out.println("No se pudo guardar el jugador.");
-            }
-        }
-
-        return jugador;
-    }
-
-    public void mostrarEscenario() {
-        for (String linea : escenario.getMapa()) {
-            System.out.println(linea);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
-    public void iniciarJuegoInteractivo() {
-        Scanner scanner = new Scanner(System.in);
-
-        while (true) {
-            limpiarPantalla();
-            mostrarEscenarioConJugador();
-
-            System.out.print("WASD> ");
-            String input = scanner.nextLine().trim().toUpperCase();
-            if (input.isEmpty()) continue;
-
-            char tecla = input.charAt(0);
-            int nuevaX = jugadorX;
-            int nuevaY = jugadorY;
-
-            switch (tecla) {
-                case 'W' -> nuevaY--;
-                case 'S' -> nuevaY++;
-                case 'A' -> nuevaX--;
-                case 'D' -> nuevaX++;
-                case 'Q' -> {
-                    System.out.println("Saliendo del juego...");
-                    return;
-                }
-                default -> {
-                    continue;
-                }
-            }
-
-            if (puedeMoverA(nuevaX, nuevaY)) {
-                jugadorX = nuevaX;
-                jugadorY = nuevaY;
-            } else {
-                // Mostrar mensaje "ouch!" sobre el jugador
-                escenario.getMapa().set(jugadorY - 1, insertarTexto(escenario.getMapa().get(jugadorY - 1), jugadorX, "ouch!"));
-            }
+    public void mostrarInicio() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/vista/vista_inicio.fxml"));
+            VistaInicio vistaInicio = new VistaInicio(this);
+            loader.setController(vistaInicio);
+            Parent root = loader.load();
+            Scene escena = new Scene(root, 800, 600);
+            ventana.setScene(escena);
+            ventana.setTitle("Inicio del Juego");
+            ventana.show();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
-    private void mostrarEscenarioConJugador() {
-        List<String> mapa = new ArrayList<>(escenario.getMapa());
-
-        for (int y = 0; y < mapa.size(); y++) {
-            String linea = mapa.get(y);
-            if (y == jugadorY) {
-                linea = insertarTexto(linea, jugadorX, "O");
-            }
-            System.out.println(linea);
-        }
-    }
-
-    private String insertarTexto(String linea, int x, String texto) {
-        StringBuilder sb = new StringBuilder(linea);
-        for (int i = 0; i < texto.length(); i++) {
-            int pos = x + i;
-            if (pos < sb.length()) {
-                sb.setCharAt(pos, texto.charAt(i));
-            }
-        }
-        return sb.toString();
-    }
-
-    private boolean puedeMoverA(int x, int y) {
+    public void mostrarJuego() {
+    try {
+        // Cargar el archivo de escenario
+        Escenario escenario = new Escenario("recursos/escenarios/escenario1.txt"); // Asegúrate de tener el archivo en la ruta correcta
         List<String> mapa = escenario.getMapa();
+        
+        // Cargar la vista del juego
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/vista/vista_juego.fxml"));
+        Parent root = loader.load();
+        
+        // Crear un GridPane para el escenario
+        GridPane grid = escenario.generarEscenario();  // Genera el escenario con la lógica de dibujo
 
-        if (y < 0 || y >= mapa.size()) return false;
+        // Añadir el GridPane con el escenario al contenedor principal
+        // Suponiendo que tienes un contenedor (por ejemplo, un GridPane o StackPane) en tu archivo FXML
+        Parent contenedorJuego = (Parent) root;
+        
+        // Aquí agregamos el escenario generado
+        if (contenedorJuego instanceof GridPane) {
+            GridPane panelJuego = (GridPane) contenedorJuego;
+            panelJuego.getChildren().add(grid);  // Agrega el escenario al panel principal
+        }
 
-        String linea = mapa.get(y);
-        if (x < 0 || x >= linea.length()) return false;
+        // Crear y mostrar la escena
+        Scene escena = new Scene(root, 480, 520); // Ajustado al tamaño del laberinto
+        ventana.setScene(escena);
+        ventana.setTitle("Laberinto");
+        ventana.show();
+        root.requestFocus(); // Necesario para capturar teclas
 
-        return linea.charAt(x) != 'x';
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+
+
+    public void mostrarFin() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/vista/vista_fin.fxml"));
+            Parent root = loader.load();
+
+            VistaFin vistaFin = loader.getController();
+
+            Scene escena = new Scene(root, 800, 600);
+            ventana.setScene(escena);
+            ventana.setTitle("Fin del Juego");
+            ventana.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    private void limpiarPantalla() {
-        System.out.print("\033[H\033[2J");
-        System.out.flush();
+    public void establecerJugador(String nombre, String email) {
+        jugador = Serializador.cargarJugador(nombre);
+        if (jugador == null) {
+            jugador = new Jugador(nombre, email);
+            Serializador.guardarJugador(jugador);
+        }
+    }
+
+    public Jugador getJugador() {
+        return jugador;
     }
 }
