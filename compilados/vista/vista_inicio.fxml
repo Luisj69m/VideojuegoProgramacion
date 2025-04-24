@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="vista.VistaInicio"
+      spacing="10" alignment="CENTER_LEFT" padding="20"
+      prefWidth="600" prefHeight="400">
+    
+    <Label text="Nombre:" />
+    <TextField fx:id="txtNombre" />
+    
+    <Label text="Email (si es nuevo):" />
+    <TextField fx:id="txtEmail" />
+    
+    <Button text="Comenzar Juego" onAction="#comenzarJuego"/>
+</VBox>
