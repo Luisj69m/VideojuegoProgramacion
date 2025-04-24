@@ -9,7 +9,7 @@
         <!-- El escenario generado por el controlador se añadirá aquí -->
     </GridPane>
 
-    <!-- Puedes añadir controles para la interacción, como un botón para reiniciar -->
+    
     <Button text="Reiniciar" GridPane.columnIndex="0" GridPane.rowIndex="1" onAction="#reiniciarJuego" />
     
 </GridPane>
