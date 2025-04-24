@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<GridPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="vista.VistaJuego"
+          alignment="CENTER" hgap="5" vgap="5" style="-fx-background-color: #F0F0F0;">
+    <!-- Aquí puedes añadir elementos adicionales como botones, labels, etc. -->
+    
+    <!-- Este es el contenedor donde se añadirá el escenario generado -->
+    <GridPane fx:id="panelJuego" GridPane.columnIndex="0" GridPane.rowIndex="0">
+        <!-- El escenario generado por el controlador se añadirá aquí -->
+    </GridPane>
+
+    <!-- Puedes añadir controles para la interacción, como un botón para reiniciar -->
+    <Button text="Reiniciar" GridPane.columnIndex="0" GridPane.rowIndex="1" onAction="#reiniciarJuego" />
+    
+</GridPane>
