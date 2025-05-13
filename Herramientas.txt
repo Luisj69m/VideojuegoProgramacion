@@ -1,0 +1,16 @@
+Bienvenido a Guillem The Frutem.A continuacion veras una serie de instrucciones para poder ejecutar el juego.
+
+1.Tener instalado javafx.Puedes descargarlo en su pagina oficial.
+
+2.El JDBC de sqlite viene ya en la carpeta de compilados, asi no tienes que descargarlo.
+
+3.Para compilar y ejecutar, te situas en la raiz de la carpeta y arriba escribes cmd.
+
+4.Una vez hecho esto procedemos a compilar:(Importante: donde dice \path\to debes cambiarlo por el nombre de tu directorio.)
+
+javac --module-path "C:path\to\javafx-sdk-24\lib" --add-modules javafx.controls,javafx.fxml,javafx.media -cp compilados\sqlite.jar -d compilados App.java controlador\*.java modelo\*.java vista\*.java
+
+
+5.Y ejecutar:
+
+java --module-path "C:path\to\javafx-sdk-24\lib" --add-modules javafx.controls,javafx.fxml,javafx.media -cp compilados;compilados\sqlite.jar App
